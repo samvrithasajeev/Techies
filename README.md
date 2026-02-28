@@ -60,12 +60,13 @@ List the key features of your project:
 
 #### Installation
 ```bash
-[Installation commands - e.g., npm install, pip install -r requirements.txt]
+Installation commands - pip install -r requirements.txt
 ```
 
 #### Run
 ```bash
-[Run commands - e.g., npm start, python app.py]
+Run commands - python app.py
+http://127.0.0.1:5000
 ```
 
 ### For Hardware:
@@ -84,14 +85,8 @@ List the key features of your project:
 
 #### Screenshots (Add at least 3)
 
-![Screenshot1](Add screenshot 1 here with proper name)
-*Add caption explaining what this shows*
-
-![Screenshot2](Add screenshot 2 here with proper name)
-*Add caption explaining what this shows*
-
-![Screenshot3](Add screenshot 3 here with proper name)
-*Add caption explaining what this shows*
+https://drive.google.com/drive/folders/1BzuyPMPLJ5_A2ySMu7LXYnGZLnOpLhEi?usp=drive_link
+It includes 8 screenshots and 1 video of the working project in it.
 
 #### Diagrams
 
@@ -362,9 +357,8 @@ python script.py -v --format json data.json
 ## Project Demo
 
 ### Video
-[Add your demo video link here - YouTube, Google Drive, etc.]
+https://drive.google.com/file/d/1XKepiTFBguSVxdidFL5CPtaHzSUl0AZX/view?usp=drive_link
 
-*Explain what the video demonstrates - key features, user flow, technical highlights*
 
 ### Additional Demos
 [Add any extra demo materials/links - Live site, APK download, online demo, etc.]
@@ -375,7 +369,7 @@ python script.py -v --format json data.json
 
 If you used AI tools during development, document them here for transparency:
 
-**Tool Used:** [e.g., GitHub Copilot, v0.dev, Cursor, ChatGPT, Claude]
+**Tool Used:**  GitHub, Git, Gemini, ChatGPT, Claude
 
 **Purpose:** [What you used it for]
 - Example: "Generated boilerplate React components"
