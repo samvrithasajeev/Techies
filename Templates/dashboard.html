@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — BudgetSmart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --g:#10b981; --gd:#059669;
+      --bg:#0a0f1e; --s8:#1e293b; --s75:#1a2844;
+      --s7:#334155; --s5:#64748b; --s4:#94a3b8; --s2:#e2e8f0;
+      --s9:#0f172a; --wh:#fff;
+      --red:#ef4444; --amb:#f59e0b;
+      --r:16px; --rs:10px;
+    }
+    html { scroll-behavior:smooth; }
+    body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--s2); min-height:100vh; padding-bottom:4rem; }
+
+    /* ── NAVBAR ── */
+    .nav { position:sticky; top:0; z-index:100; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; padding:.85rem 1.5rem; background:rgba(10,15,30,.9); backdrop-filter:blur(20px); border-bottom:1px solid rgba(255,255,255,.07); }
+    .nav-l { display:flex; }
+    .nav-r { display:flex; justify-content:flex-end; }
+    .nav-c { text-align:center; }
+    .logout { display:inline-flex; align-items:center; gap:.45rem; padding:.45rem .9rem; background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.25); border-radius:8px; color:#fca5a5; font-size:.82rem; font-weight:500; text-decoration:none; cursor:pointer; transition:all .2s; }
+    .logout:hover { background:rgba(239,68,68,.2); }
+    .brand { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:800; color:var(--g); }
+    .uchip { display:flex; align-items:center; gap:.6rem; font-size:.85rem; color:var(--s4); }
+    .uav { width:32px; height:32px; background:linear-gradient(135deg,var(--g),#34d399); border-radius:8px; display:flex; align-items:center; justify-content:center; font-family:'Syne',sans-serif; font-weight:700; font-size:.9rem; color:#fff; }
+
+    /* ── MAIN ── */
+    .main { max-width:1200px; margin:0 auto; padding:1.5rem 1.25rem; display:flex; flex-direction:column; gap:1.75rem; }
+
+    /* ── CONTROLS ── */
+    .ctrl { display:flex; flex-wrap:wrap; gap:1rem; align-items:flex-end; background:var(--s8); border:1px solid rgba(255,255,255,.07); border-radius:var(--r); padding:1.25rem 1.5rem; }
+    .cl { display:block; font-size:.75rem; font-weight:600; color:var(--s4); text-transform:uppercase; letter-spacing:.06em; margin-bottom:.45rem; }
+
+    /* Month + Year */
+    .month-year-group { display:flex; flex-direction:column; }
+    .month-year-row   { display:flex; gap:.5rem; align-items:center; }
+
+    .sel-wrap { position:relative; display:inline-flex; align-items:center; }
+    .sel-wrap select {
+      appearance:none; padding:.6rem 2rem .6rem .9rem;
+      background:var(--s9); border:1.5px solid rgba(255,255,255,.1);
+      border-radius:var(--rs); color:var(--wh);
+      font-family:'DM Sans',sans-serif; font-size:.9rem;
+      cursor:pointer; outline:none; transition:border-color .2s;
+    }
+    .sel-wrap select:focus { border-color:var(--g); }
+    #msel { min-width:130px; }
+    .sel-wrap svg { position:absolute; right:.6rem; color:var(--s4); pointer-events:none; }
+
+    /* Year: typed input */
+    #yinp {
+      padding:.6rem .9rem; background:var(--s9);
+      border:1.5px solid rgba(255,255,255,.1); border-radius:var(--rs);
+      color:var(--wh); font-family:'DM Sans',sans-serif; font-size:.9rem;
+      width:82px; outline:none; transition:border-color .2s;
+      -moz-appearance:textfield;
+    }
+    #yinp::-webkit-outer-spin-button,
+    #yinp::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+    #yinp:focus { border-color:var(--g); }
+
+    .binrow { display:flex; align-items:center; }
+    .cpfx { padding:.6rem .75rem; background:var(--s7); border:1.5px solid rgba(255,255,255,.1); border-right:none; border-radius:var(--rs) 0 0 var(--rs); color:var(--g); font-weight:600; }
+    #bin { padding:.6rem .9rem; background:var(--s9); border:1.5px solid rgba(255,255,255,.1); border-left:none; border-right:none; color:var(--wh); font-family:'DM Sans',sans-serif; font-size:.9rem; width:180px; outline:none; transition:border-color .2s; }
+    #bin:focus { border-color:var(--g); box-shadow:0 0 0 1px var(--g); }
+    .sbtn { padding:.6rem 1.1rem; background:var(--g); border:none; border-radius:0 var(--rs) var(--rs) 0; color:#fff; font-weight:600; font-size:.85rem; cursor:pointer; transition:background .2s; }
+    .sbtn:hover { background:var(--gd); }
+
+    /* Budget hint */
+    .budget-hint { font-size:.75rem; color:var(--s5); margin-top:.4rem; }
+    .budget-hint span { color:var(--amb); font-weight:600; }
+
+    /* ── ALERT ── */
+    .ba { padding:.85rem 1.25rem; border-radius:var(--rs); font-size:.9rem; font-weight:500; display:flex; align-items:center; gap:.6rem; animation:sld .3s ease; }
+    .ba.warn { background:rgba(245,158,11,.12); color:#fcd34d; border:1px solid rgba(245,158,11,.3); }
+    .ba.dang { background:rgba(239,68,68,.12); color:#fca5a5; border:1px solid rgba(239,68,68,.3); }
+    .ba.good { background:rgba(16,185,129,.1); color:#6ee7b7; border:1px solid rgba(16,185,129,.3); }
+    @keyframes sld { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ── SUMMARY CARDS ── */
+    .sgrid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
+    .sc-s::before { display:none; }
+    .sc { background:var(--s8); border:1px solid rgba(255,255,255,.07); border-radius:var(--r); padding:1.4rem 1.25rem; display:flex; align-items:flex-start; gap:1rem; transition:transform .2s,box-shadow .2s; position:relative; overflow:hidden; }
+    .sc::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+    .sc-b::before { background:linear-gradient(90deg,#3b82f6,#60a5fa); }
+    .sc-e::before { background:linear-gradient(90deg,var(--red),#f87171); }
+    .sc-r::before { background:linear-gradient(90deg,var(--g),#34d399); }
+    .sc-s::before { background:linear-gradient(90deg,#f59e0b,#fcd34d); }
+    .sc-u::before { background:linear-gradient(90deg,#a855f7,#c084fc); }
+    .sc:hover { transform:translateY(-3px); box-shadow:0 12px 32px rgba(0,0,0,.3); }
+    .ci  { font-size:1.6rem; line-height:1; }
+    .clb { font-size:.75rem; font-weight:600; color:var(--s4); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.3rem; }
+    .cv  { font-family:'Syne',sans-serif; font-size:1.5rem; font-weight:800; color:var(--wh); margin-bottom:.2rem; }
+    .csub { font-size:.75rem; color:var(--s5); }
+    .ubw { width:100%; height:5px; background:var(--s7); border-radius:99px; margin-top:.4rem; overflow:hidden; }
+    .ub  { height:100%; border-radius:99px; transition:width .5s ease; background:#a855f7; }
+
+    /* ── SECTION ── */
+    .sec { background:var(--s8); border:1px solid rgba(255,255,255,.07); border-radius:var(--r); padding:1.5rem; }
+    .sech { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem; }
+    .st  { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:700; color:var(--wh); }
+    .ss  { font-size:.8rem; color:var(--s5); margin-top:2px; }
+    .addcat { display:inline-flex; align-items:center; gap:.4rem; padding:.55rem 1.1rem; background:var(--g); border:none; border-radius:var(--rs); color:#fff; font-family:'DM Sans',sans-serif; font-size:.85rem; font-weight:600; cursor:pointer; transition:background .2s,transform .15s; }
+    .addcat:hover { background:var(--gd); transform:translateY(-1px); }
+
+    /* ── CATEGORIES: horizontal tab row ── */
+    .cat-tab-row {
+      display:flex; flex-wrap:wrap; gap:.65rem;
+      padding-bottom:1rem;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      margin-bottom:1.25rem;
+    }
+    .ctab {
+      display:flex; align-items:center; gap:.5rem;
+      padding:.55rem 1rem;
+      background:var(--s9);
+      border:1.5px solid rgba(255,255,255,.08);
+      border-radius:var(--rs);
+      cursor:pointer; user-select:none;
+      transition:all .18s;
+      position:relative;
+    }
+    .ctab:hover { border-color:rgba(255,255,255,.2); background:rgba(255,255,255,.04); }
+    .ctab.active {
+      border-color:var(--catcolor, var(--g));
+      background:rgba(16,185,129,.08);
+      box-shadow:0 0 0 1px var(--catcolor, var(--g));
+    }
+    .ctab .dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+    .ctab .cn  { font-family:'Syne',sans-serif; font-weight:700; font-size:.88rem; color:var(--wh); white-space:nowrap; }
+    .ctab-acts { display:flex; gap:.25rem; margin-left:.3rem; }
+    .bic  { width:26px; height:26px; display:flex; align-items:center; justify-content:center; border:none; border-radius:6px; cursor:pointer; font-size:.72rem; transition:all .15s; }
+    .bic.ed { background:rgba(59,130,246,.15); color:#60a5fa; }
+    .bic.dl { background:rgba(239,68,68,.15);  color:#f87171; }
+    .bic:hover { opacity:.8; transform:scale(1.08); }
+
+    /* ── Category detail panel ── */
+    .cat-detail-panel {
+      display:none;
+      background:var(--s75);
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:var(--rs);
+      overflow:hidden;
+      animation:fi .2s ease;
+    }
+    .cat-detail-panel.visible { display:block; }
+
+    /* Detail panel header */
+    .cpanel-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:.9rem 1.1rem;
+      background:rgba(0,0,0,.2);
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .cpanel-title { display:flex; align-items:center; gap:.6rem; }
+    .cpanel-title .dot { width:10px; height:10px; border-radius:50%; }
+    .cpanel-name { font-family:'Syne',sans-serif; font-weight:800; font-size:1rem; color:var(--wh); }
+    .cat-stats-bar {
+      display:grid; grid-template-columns:repeat(4,1fr);
+      gap:.75rem; padding:1rem 1.1rem;
+      background:rgba(0,0,0,.2);
+      border-bottom:1px solid rgba(255,255,255,.05);
+    }
+    .csb-item { text-align:center; }
+    .csb-label { font-size:.68rem; font-weight:600; color:var(--s4); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.25rem; }
+    .csb-val { font-family:'Syne',sans-serif; font-weight:800; font-size:1.05rem; }
+    .csb-val.op  { color:#60a5fa; }
+    .csb-val.exp { color:#f87171; }
+    .csb-val.rem { color:var(--g); }
+    .csb-val.cl  { color:#fbbf24; }
+    .csb-val.neg { color:var(--red); }
+
+    /* Closed session banner */
+    .closed-banner {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:.65rem 1.1rem;
+      background:rgba(251,191,36,.07);
+      border-bottom:1px solid rgba(251,191,36,.2);
+    }
+    .closed-badge {
+      display:inline-flex; align-items:center; gap:.35rem;
+      font-size:.75rem; font-weight:700; color:#fbbf24;
+      text-transform:uppercase; letter-spacing:.06em;
+    }
+    .closed-badge::before { content:'🔒'; }
+    .new-session-btn {
+      display:inline-flex; align-items:center; gap:.4rem;
+      padding:.42rem .9rem;
+      background:linear-gradient(135deg,var(--g),#34d399);
+      border:none; border-radius:8px;
+      color:#fff; font-size:.8rem; font-weight:700;
+      cursor:pointer; transition:opacity .2s;
+    }
+    .new-session-btn:hover { opacity:.85; }
+
+    /* Session history accordion */
+    .session-history { border-top:1px solid rgba(255,255,255,.05); }
+    .sess-hist-toggle {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:.7rem 1.1rem;
+      background:rgba(0,0,0,.15);
+      cursor:pointer; user-select:none;
+      font-size:.78rem; font-weight:600; color:var(--s4);
+    }
+    .sess-hist-toggle:hover { background:rgba(255,255,255,.03); }
+    .sess-hist-body { display:none; }
+    .sess-hist-body.open { display:block; }
+    .sess-hist-item {
+      padding:.85rem 1.1rem;
+      border-bottom:1px solid rgba(255,255,255,.04);
+      background:rgba(0,0,0,.1);
+    }
+    .sess-hist-item:last-child { border-bottom:none; }
+    .shi-header {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:.6rem;
+    }
+    .shi-title { font-family:'Syne',sans-serif; font-weight:700; font-size:.85rem; color:var(--s4); }
+    .shi-stats { display:flex; gap:1.25rem; flex-wrap:wrap; }
+    .shi-stat { font-size:.78rem; color:var(--s5); }
+    .shi-stat span { font-weight:700; }
+    .shi-stat span.op  { color:#60a5fa; }
+    .shi-stat span.exp { color:#f87171; }
+    .shi-stat span.cl  { color:#fbbf24; }
+
+    /* Closing balance set button */
+    .set-closing-btn {
+      display:inline-flex; align-items:center; gap:.35rem;
+      padding:.28rem .65rem;
+      background:rgba(251,191,36,.1); border:1px solid rgba(251,191,36,.3);
+      border-radius:6px; color:#fbbf24; font-size:.72rem; font-weight:600;
+      cursor:pointer; transition:all .2s; margin-top:.4rem;
+    }
+    .set-closing-btn:hover { background:rgba(251,191,36,.2); }
+
+    /* Transactions + chart area */
+    .cbi2 { padding:.85rem 1.1rem; }
+    .tarow { display:flex; justify-content:flex-end; margin-bottom:.75rem; }
+    .addtxn { display:inline-flex; align-items:center; gap:.35rem; padding:.38rem .8rem; background:rgba(16,185,129,.1); border:1px solid rgba(16,185,129,.25); border-radius:6px; color:var(--g); font-size:.8rem; font-weight:600; cursor:pointer; transition:all .2s; }
+    .addtxn:hover { background:rgba(16,185,129,.2); }
+
+    /* ── Transaction table ── */
+    .txn-table { width:100%; border-collapse:collapse; font-size:.82rem; }
+    .txn-table thead th { text-align:left; padding:.45rem .65rem; font-size:.68rem; font-weight:600; color:var(--s4); text-transform:uppercase; letter-spacing:.05em; border-bottom:1px solid rgba(255,255,255,.07); }
+    .txn-table thead th.num { text-align:right; }
+    .txn-table tbody tr { border-bottom:1px solid rgba(255,255,255,.04); transition:background .15s; animation:fi .2s ease; }
+    .txn-table tbody tr:last-child { border-bottom:none; }
+    .txn-table tbody tr:hover { background:rgba(255,255,255,.03); }
+    @keyframes fi { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
+    .txn-table td { padding:.55rem .65rem; color:var(--s2); vertical-align:middle; }
+    .txn-table td.num { text-align:right; font-family:'Syne',sans-serif; font-weight:700; }
+    .txn-table td.actions { text-align:right; white-space:nowrap; }
+    .tbad { display:inline-block; font-size:.62rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; padding:2px 7px; border-radius:99px; }
+    .tbad.income  { background:rgba(16,185,129,.15); color:#34d399; }
+    .tbad.expense { background:rgba(239,68,68,.15);  color:#f87171; }
+    .amt-inc { color:var(--g); }
+    .amt-exp { color:var(--red); }
+    .etx { text-align:center; padding:1.25rem; color:var(--s5); font-size:.82rem; }
+
+    /* Per-category chart */
+    .cat-chart-section { margin-top:1.1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,.05); }
+    .cat-chart-title { font-size:.75rem; font-weight:600; color:var(--s4); text-transform:uppercase; letter-spacing:.06em; margin-bottom:.75rem; }
+    .cat-chartwrap { max-width:300px; margin:0 auto; }
+
+    /* ── EMPTY STATE ── */
+    .emp { text-align:center; padding:3rem 1rem; color:var(--s5); }
+    .emp .empi { font-size:2.5rem; margin-bottom:.75rem; }
+    .emp p     { font-size:.95rem; font-weight:500; color:var(--s4); }
+    .emp small { font-size:.8rem; }
+
+    /* ── MODAL ── */
+    .mov { position:fixed; inset:0; z-index:200; background:rgba(0,0,0,.65); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; padding:1rem; animation:fo .2s ease; }
+    @keyframes fo { from{opacity:0} to{opacity:1} }
+    .mc  { background:var(--s8); border:1px solid rgba(255,255,255,.1); border-radius:20px; width:100%; max-width:420px; box-shadow:0 30px 60px rgba(0,0,0,.5); animation:su .25s ease; }
+    @keyframes su { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .mh  { display:flex; align-items:center; justify-content:space-between; padding:1.25rem 1.5rem; border-bottom:1px solid rgba(255,255,255,.07); }
+    .mh h3 { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; color:var(--wh); }
+    .mcl { width:28px; height:28px; background:rgba(255,255,255,.08); border:none; border-radius:6px; color:var(--s4); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s; }
+    .mcl:hover { background:rgba(255,255,255,.15); }
+    .mb  { padding:1.5rem; display:flex; flex-direction:column; gap:1rem; }
+    .fg  { display:flex; flex-direction:column; gap:.4rem; }
+    .fg label { font-size:.78rem; font-weight:600; color:var(--s4); text-transform:uppercase; letter-spacing:.04em; }
+    .fg input  { padding:.65rem .9rem; background:var(--s9); border:1.5px solid rgba(255,255,255,.08); border-radius:var(--rs); color:var(--wh); font-family:'DM Sans',sans-serif; font-size:.9rem; outline:none; transition:border-color .2s; }
+    .fg input:focus { border-color:var(--g); }
+    .ttog { display:flex; gap:.5rem; }
+    .tbtn { flex:1; padding:.6rem; border:1.5px solid rgba(255,255,255,.08); border-radius:var(--rs); background:var(--s9); color:var(--s4); font-size:.875rem; font-weight:500; cursor:pointer; transition:all .2s; }
+    .tbtn.on#te { background:rgba(239,68,68,.15); border-color:rgba(239,68,68,.4); color:#f87171; }
+    .tbtn.on#ti { background:rgba(16,185,129,.15); border-color:rgba(16,185,129,.4); color:#34d399; }
+    .mf  { padding:1rem 1.5rem; display:flex; gap:.75rem; justify-content:flex-end; border-top:1px solid rgba(255,255,255,.07); }
+    .bcan { padding:.6rem 1.25rem; background:transparent; border:1px solid rgba(255,255,255,.12); border-radius:var(--rs); color:var(--s4); font-size:.875rem; cursor:pointer; transition:background .15s; }
+    .bcan:hover { background:rgba(255,255,255,.05); }
+    .bcon { padding:.6rem 1.5rem; background:var(--g); border:none; border-radius:var(--rs); color:#fff; font-weight:600; font-size:.875rem; cursor:pointer; transition:background .2s; }
+    .bcon:hover { background:var(--gd); }
+
+    /* ── TOAST ── */
+    .toast { position:fixed; bottom:1.5rem; right:1.5rem; z-index:999; padding:.75rem 1.25rem; border-radius:10px; font-size:.875rem; font-weight:500; box-shadow:0 8px 24px rgba(0,0,0,.4); animation:ti2 .3s ease; }
+    .toast.ok { background:#064e3b; color:#6ee7b7; border:1px solid rgba(16,185,129,.3); }
+    .toast.er { background:#450a0a; color:#fca5a5; border:1px solid rgba(239,68,68,.3); }
+    @keyframes ti2 { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+    .hide { display:none !important; }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:900px) {
+      .sgrid{grid-template-columns:repeat(2,1fr)}
+      .cat-stats-bar{grid-template-columns:repeat(2,1fr)}
+    }
+    @media(max-width:620px) {
+      .sgrid{grid-template-columns:1fr 1fr;gap:.75rem}
+      .cv{font-size:1.15rem}
+      .ctrl{flex-direction:column;align-items:stretch}
+      #bin{width:100%}
+      .nav{padding:.75rem 1rem}
+      .uchip span{display:none}
+      .cat-stats-bar{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:400px) { .sgrid{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<header class="nav">
+  <div class="nav-l">
+    <a class="logout" href="/logout" onclick="return confirm('Logout?')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      Logout
+    </a>
+  </div>
+  <div class="nav-c"><span class="brand">₹ BudgetSmart</span></div>
+  <div class="nav-r">
+    <div class="uchip">
+      <div class="uav" id="uav">U</div>
+      <span id="uname">{{ user.name }}</span>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- CONTROLS -->
+  <section class="ctrl">
+    <!-- Month + Year -->
+    <div class="month-year-group">
+      <label class="cl">Viewing Period</label>
+      <div class="month-year-row">
+        <!-- Month dropdown -->
+        <div class="sel-wrap">
+          <select id="msel" onchange="onPeriodChange()">
+            <option value="01">January</option>
+            <option value="02">February</option>
+            <option value="03">March</option>
+            <option value="04">April</option>
+            <option value="05">May</option>
+            <option value="06">June</option>
+            <option value="07">July</option>
+            <option value="08">August</option>
+            <option value="09">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <!-- Year: now a typeable number input -->
+        <input type="number" id="yinp" min="2000" max="2099" placeholder="Year"
+               onchange="onPeriodChange()" onkeydown="if(event.key==='Enter')onPeriodChange()"/>
+      </div>
+    </div>
+
+    <!-- Monthly Budget -->
+    <div>
+      <label class="cl">Monthly Budget <span style="color:var(--s5);font-weight:400;text-transform:none">(amount you plan to spend)</span></label>
+      <div class="binrow">
+        <span class="cpfx">₹</span>
+        <input type="number" id="bin" placeholder="e.g. 500 out of 600" min="0" step="any"/>
+        <button class="sbtn" onclick="saveBudget()">Save</button>
+      </div>
+      <div class="budget-hint" id="budgetHint"></div>
+    </div>
+  </section>
+
+  <!-- BUDGET ALERT -->
+  <div id="ba" class="hide"></div>
+
+  <!-- SUMMARY CARDS (4 cards: budget, expense, remaining, usage) -->
+  <section class="sgrid">
+    <div class="sc sc-b">
+      <div class="ci">🏦</div>
+      <div>
+        <div class="clb">Total Remaining</div>
+        <div class="cv" id="sb">₹0.00</div>
+        <div class="csub">Sum of all categories</div>
+      </div>
+    </div>
+    <div class="sc sc-e">
+      <div class="ci">💸</div>
+      <div>
+        <div class="clb">Total Spent</div>
+        <div class="cv" id="se">₹0.00</div>
+        <div class="csub">Across all categories</div>
+      </div>
+    </div>
+    <div class="sc sc-r">
+      <div class="ci">💰</div>
+      <div>
+        <div class="clb">Budget Left</div>
+        <div class="cv" id="sr">₹0.00</div>
+        <div class="csub">Spend remaining</div>
+      </div>
+    </div>
+    <div class="sc sc-u">
+      <div class="ci">📊</div>
+      <div>
+        <div class="clb">Budget Used</div>
+        <div class="cv" id="su">0%</div>
+        <div class="csub"><div class="ubw"><div class="ub" id="ubar"></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="sec">
+    <div class="sech">
+      <div>
+        <h2 class="st">Payment Sources</h2>
+        <p class="ss">Click a source to view its details, transactions &amp; chart</p>
+      </div>
+      <button class="addcat" onclick="openCat()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add Category
+      </button>
+    </div>
+
+    <!-- Horizontal tab row -->
+    <div class="cat-tab-row" id="catTabRow">
+      <div class="emp" id="cemp" style="width:100%">
+        <div class="empi">🗂️</div>
+        <p>No categories yet.</p>
+        <small>Add Cash, GPay, SBI Bank etc. They'll appear side by side here.</small>
+      </div>
+    </div>
+
+    <!-- Single detail panel — swaps content on tab click -->
+    <div class="cat-detail-panel" id="catDetailPanel"></div>
+  </section>
+
+
+</main>
+
+<!-- CATEGORY MODAL -->
+<div id="catmod" class="mov hide" onclick="if(event.target===this)closeCat()">
+  <div class="mc">
+    <div class="mh">
+      <h3 id="cmtitle">Add Category</h3>
+      <button class="mcl" onclick="closeCat()">✕</button>
+    </div>
+    <div class="mb">
+      <input type="hidden" id="cid"/>
+      <div class="fg">
+        <label>Category Name</label>
+        <input type="text" id="cname" placeholder="e.g. GPay, SBI Bank, Cash…"/>
+      </div>
+      <div class="fg">
+        <label>Opening Balance (₹)</label>
+        <input type="number" id="copn" placeholder="0.00" min="0" step="any"/>
+      </div>
+      <!-- Use closing balance from existing category -->
+      <div class="fg" id="useClosingWrap" style="display:none">
+        <label>Or use closing balance from</label>
+        <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+          <select id="closeFromSel" style="flex:1;padding:.55rem .9rem;background:var(--s9);border:1.5px solid rgba(255,255,255,.1);border-radius:var(--rs);color:var(--wh);font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none">
+            <option value="">— Select a category —</option>
+          </select>
+          <button type="button" onclick="applyClosingBalance()"
+            style="padding:.55rem 1rem;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);border-radius:var(--rs);color:#fbbf24;font-size:.82rem;font-weight:600;cursor:pointer;white-space:nowrap">
+            Use as Opening
+          </button>
+        </div>
+        <small style="color:var(--s5);font-size:.72rem;margin-top:.25rem">This will fill the opening balance above with the chosen category's closing balance.</small>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="bcan" onclick="closeCat()">Cancel</button>
+      <button class="bcon" onclick="saveCat()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- CLOSING BALANCE / CLOSE SESSION MODAL -->
+<div id="closingmod" class="mov hide" onclick="if(event.target===this)closeClosing()">
+  <div class="mc">
+    <div class="mh">
+      <h3>Close Session</h3>
+      <button class="mcl" onclick="closeClosing()">✕</button>
+    </div>
+    <div class="mb">
+      <input type="hidden" id="closing-cid"/>
+      <p style="font-size:.85rem;color:var(--s4);line-height:1.5">
+        Set the <strong style="color:#fbbf24">closing balance</strong> to lock this session. All existing transactions will be preserved as read-only history. You can then start a fresh session with a new opening balance.
+      </p>
+      <div class="fg">
+        <label>Closing Balance (₹)</label>
+        <input type="number" id="closing-val" placeholder="0.00" min="0" step="any"/>
+      </div>
+      <button type="button" onclick="useRemaining()"
+        style="padding:.45rem .9rem;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);border-radius:var(--rs);color:var(--g);font-size:.8rem;font-weight:600;cursor:pointer">
+        📋 Use Current Remaining Balance
+      </button>
+    </div>
+    <div class="mf">
+      <button class="bcan" onclick="closeClosing()">Cancel</button>
+      <button class="bcon" style="background:#f59e0b" onclick="saveClosing()">🔒 Close Session</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEW SESSION MODAL -->
+<div id="newSessionMod" class="mov hide" onclick="if(event.target===this)closeNewSession()">
+  <div class="mc">
+    <div class="mh">
+      <h3>Start New Session</h3>
+      <button class="mcl" onclick="closeNewSession()">✕</button>
+    </div>
+    <div class="mb">
+      <input type="hidden" id="ns-parent-id"/>
+      <p style="font-size:.85rem;color:var(--s4);line-height:1.5">
+        Starting a new session for <strong style="color:var(--wh)" id="ns-cat-name"></strong>. The previous session's records are preserved. Enter the opening balance for this new session.
+      </p>
+      <div class="fg">
+        <label>New Opening Balance (₹)</label>
+        <input type="number" id="ns-opening" placeholder="0.00" min="0" step="any"/>
+      </div>
+      <p style="font-size:.75rem;color:var(--s5)">💡 Pre-filled from the previous session's closing balance.</p>
+    </div>
+    <div class="mf">
+      <button class="bcan" onclick="closeNewSession()">Cancel</button>
+      <button class="bcon" onclick="saveNewSession()">▶ Start Session</button>
+    </div>
+  </div>
+</div>
+
+<!-- TRANSACTION MODAL -->
+<div id="txnmod" class="mov hide" onclick="if(event.target===this)closeTxn()">
+  <div class="mc">
+    <div class="mh">
+      <h3 id="tmtitle">Add Transaction</h3>
+      <button class="mcl" onclick="closeTxn()">✕</button>
+    </div>
+    <div class="mb">
+      <input type="hidden" id="tid"/>
+      <input type="hidden" id="tcid"/>
+      <input type="hidden" id="ttype" value="expense"/>
+      <div class="fg">
+        <label>Type</label>
+        <div class="ttog">
+          <button class="tbtn on" id="te" onclick="stype('expense')">💸 Expense</button>
+          <button class="tbtn"    id="ti" onclick="stype('income')">💵 Income</button>
+        </div>
+      </div>
+      <div class="fg">
+        <label>Date</label>
+        <input type="date" id="tdate"/>
+      </div>
+      <div class="fg">
+        <label>Description / Reason</label>
+        <input type="text" id="treason" placeholder="e.g. Lunch, Bus fare, Books…"/>
+      </div>
+      <div class="fg">
+        <label>Amount (₹)</label>
+        <input type="number" id="tamt" placeholder="0.00" min="0.01" step="any"/>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="bcan" onclick="closeTxn()">Cancel</button>
+      <button class="bcon" onclick="saveTxn()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast hide"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const COLORS = ['#10b981','#3b82f6','#f59e0b','#a855f7','#ef4444','#06b6d4','#84cc16','#f97316','#ec4899','#14b8a6'];
+let month = '', cats = [], sum = {};
+const catCharts = {};
+
+window.addEventListener('DOMContentLoaded', () => {
+  initSelectors();
+  const n = `{{ user.name }}`;
+  document.getElementById('uav').textContent = n.charAt(0).toUpperCase();
+  document.getElementById('uname').textContent = n;
+  load();
+});
+
+// ── MONTH + YEAR ──────────────────────────────────────────
+function initSelectors() {
+  const now  = new Date();
+  const curY = now.getFullYear();
+  const curM = String(now.getMonth() + 1).padStart(2, '0');
+  document.getElementById('yinp').value = curY;
+  document.getElementById('msel').value = curM;
+  month = `${curY}-${curM}`;
+}
+
+function onPeriodChange() {
+  const m = document.getElementById('msel').value;
+  let y   = parseInt(document.getElementById('yinp').value);
+  // Validate year
+  if (!y || y < 2000 || y > 2099) {
+    document.getElementById('yinp').style.borderColor = '#ef4444';
+    return;
+  }
+  document.getElementById('yinp').style.borderColor = '';
+  month = `${y}-${m}`;
+  Object.values(catCharts).forEach(c => c && c.destroy());
+  for (const k in catCharts) delete catCharts[k];
+  load();
+}
+
+// ── LOAD ──────────────────────────────────────────────────
+async function load() {
+  await Promise.all([loadSum(), loadBin()]);
+  await loadCats();
+}
+
+async function loadSum() {
+  const d = await get(`/api/summary?month=${month}`);
+  if (d.error) return;
+  sum = d;
+  renderCards(d);
+}
+
+async function loadBin() {
+  const d = await get(`/api/budget?month=${month}`);
+  if (!d.error) document.getElementById('bin').value = d.monthly_budget || '';
+}
+
+async function loadCats() {
+  const d = await get(`/api/categories?month=${month}`);
+  if (d.error) return;
+  cats = d.categories || [];
+  renderCats();
+}
+
+// ── SUMMARY CARDS ─────────────────────────────────────────
+function renderCards(d) {
+  const b = d.monthly_budget || 0;
+  const e = d.total_expense  || 0;
+  const r = d.remaining_balance !== undefined ? d.remaining_balance : (b - e);
+  const u = d.usage_pct || 0;
+
+  // Total remaining = sum of (opening_balance + income - expense) across all categories
+  const totalRemaining = (d.categories || []).reduce((acc, c) => acc + (c.remaining || 0), 0);
+
+  setText('sb', fmt(totalRemaining));
+  setText('se', fmt(e));
+  setText('sr', fmt(r));
+  setText('su', u + '%');
+
+  const bar = document.getElementById('ubar');
+  bar.style.width = Math.min(u, 100) + '%';
+  bar.style.background = u >= 100 ? '#ef4444' : u >= 80 ? '#f59e0b' : '#a855f7';
+
+  const ba = document.getElementById('ba');
+  if (b > 0) {
+    if (u >= 100) {
+      ba.className = 'ba dang';
+      ba.textContent = '🚨 Budget Exceeded! Your total expenses have surpassed your spending budget.';
+    } else if (u >= 80) {
+      ba.className = 'ba warn';
+      ba.textContent = `⚠️ Warning: You have used ${u}% of your spending budget. Spend carefully!`;
+    } else if (u > 0) {
+      ba.className = 'ba good';
+      ba.textContent = `✅ Good going! You've used ${u}% of your budget — on track to save.`;
+    } else {
+      ba.className = 'hide';
+    }
+  } else {
+    ba.className = 'hide';
+  }
+
+  // Budget hint below input
+  updateBudgetHint(b);
+}
+
+function updateBudgetHint(b) {
+  const hint = document.getElementById('budgetHint');
+  if (!b || b <= 0) { hint.textContent = ''; return; }
+  const e = sum.total_expense || 0;
+  const leftToSpend = b - e;
+  if (leftToSpend >= 0) {
+    hint.innerHTML = `You can still spend <span>₹${(leftToSpend).toLocaleString('en-IN', {minimumFractionDigits:2})}</span> this month`;
+  } else {
+    hint.innerHTML = `<span style="color:#f87171">Over budget by ₹${Math.abs(leftToSpend).toLocaleString('en-IN', {minimumFractionDigits:2})}</span>`;
+  }
+}
+
+async function saveBudget() {
+  const v = parseFloat(document.getElementById('bin').value) || 0;
+  const r = await post('/api/budget', { month, monthly_budget: v });
+  if (r.error) { toast(r.error, 'er'); return; }
+  toast('Budget saved! 💾', 'ok');
+  loadSum();
+}
+
+// ── RENDER CATEGORIES (horizontal tabs) ───────────────────
+let activeCatId = null;
+
+function renderCats() {
+  const row = document.getElementById('catTabRow');
+  const emp = document.getElementById('cemp');
+  // Remove old tabs only
+  row.querySelectorAll('.ctab').forEach(e => e.remove());
+
+  if (!cats.length) {
+    emp.style.display = 'block';
+    document.getElementById('catDetailPanel').classList.remove('visible');
+    activeCatId = null;
+    return;
+  }
+  emp.style.display = 'none';
+
+  const cm = {};
+  (sum.categories || []).forEach(c => { cm[c.id] = c; });
+
+  cats.forEach((cat, i) => {
+    const col      = COLORS[i % COLORS.length];
+    const det      = cm[cat.id] || {};
+    const isClosed = det.is_closed || cat.is_closed;
+    const sessLabel = (cat.session_num && cat.session_num > 1) ? ` S${cat.session_num}` : '';
+    const tab = document.createElement('div');
+    tab.className = 'ctab' + (cat.id === activeCatId ? ' active' : '');
+    tab.id = `tab-${cat.id}`;
+    tab.style.setProperty('--catcolor', isClosed ? '#64748b' : col);
+    tab.innerHTML = `
+      <span class="dot" style="background:${isClosed ? '#64748b' : col}"></span>
+      <span class="cn" style="${isClosed ? 'color:var(--s5)' : ''}">${esc(cat.name)}${sessLabel}${isClosed ? ' 🔒' : ''}</span>
+      ${!isClosed ? `<div class="ctab-acts" onclick="event.stopPropagation()">
+        <button class="bic ed" onclick="openCat(${cat.id})" title="Edit">✏️</button>
+        <button class="bic dl" onclick="delCat(${cat.id})" title="Delete">🗑️</button>
+      </div>` : `<div class="ctab-acts" onclick="event.stopPropagation()">
+        <button class="bic dl" onclick="delCat(${cat.id})" title="Delete">🗑️</button>
+      </div>`}`;
+    tab.addEventListener('click', () => selectCat(cat.id));
+    row.appendChild(tab);
+  });
+
+  // If previously active cat still exists, re-render its panel (stats may have updated)
+  if (activeCatId && cats.find(c => c.id === activeCatId)) {
+    renderCatPanel(activeCatId);
+  } else if (cats.length) {
+    // Auto-select first if nothing active
+    selectCat(cats[0].id);
+  }
+}
+
+function selectCat(id) {
+  activeCatId = id;
+  // Update tab active states
+  document.querySelectorAll('.ctab').forEach(t => t.classList.remove('active'));
+  const tab = document.getElementById(`tab-${id}`);
+  if (tab) tab.classList.add('active');
+  renderCatPanel(id);
+}
+
+function renderCatPanel(id) {
+  const cat = cats.find(c => c.id === id);
+  if (!cat) return;
+  const cm  = {};
+  (sum.categories || []).forEach(c => { cm[c.id] = c; });
+  const col = COLORS[cats.indexOf(cat) % COLORS.length];
+  const det = cm[cat.id] || { remaining: cat.opening_balance, income: 0, expense: 0, is_closed: false, closing_balance: null };
+  const neg = det.remaining < 0 ? ' neg' : '';
+  const isClosed = det.is_closed || cat.is_closed;
+
+  // Build history chain: walk parent_id links
+  const historyItems = [];
+  let   pid = cat.parent_id;
+  while (pid) {
+    const p = cats.find(c => c.id === pid);
+    if (!p) break;
+    const pd = cm[p.id] || { opening_balance: p.opening_balance, expense: 0, closing_balance: p.closing_balance };
+    historyItems.unshift({ cat: p, det: pd });
+    pid = p.parent_id;
+  }
+
+  const sessionLabel = (cat.session_num && cat.session_num > 1) ? ` · Session ${cat.session_num}` : '';
+
+  const panel = document.getElementById('catDetailPanel');
+  panel.classList.add('visible');
+  panel.innerHTML = `
+    <!-- Panel header -->
+    <div class="cpanel-header">
+      <div class="cpanel-title">
+        <span class="dot" style="background:${col}"></span>
+        <span class="cpanel-name">${esc(cat.name)}${sessionLabel}</span>
+      </div>
+    </div>
+
+    ${isClosed ? `
+    <!-- Closed banner -->
+    <div class="closed-banner">
+      <span class="closed-badge">Session Closed</span>
+      <button class="new-session-btn" onclick="openNewSession(${cat.id})">
+        ＋ Start New Session
+      </button>
+    </div>` : ''}
+
+    <!-- Stat bar: 4 items -->
+    <div class="cat-stats-bar">
+      <div class="csb-item">
+        <div class="csb-label">💳 Opening Balance</div>
+        <div class="csb-val op">${fmt(cat.opening_balance)}</div>
+      </div>
+      <div class="csb-item">
+        <div class="csb-label">💸 Total Expense</div>
+        <div class="csb-val exp">${fmt(det.expense || 0)}</div>
+      </div>
+      <div class="csb-item">
+        <div class="csb-label">💰 Remaining Balance</div>
+        <div class="csb-val rem${neg}">${fmt(det.remaining)}</div>
+      </div>
+
+    </div>
+
+    <!-- Transactions -->
+    <div class="cbi2">
+      ${!isClosed ? `
+      <div class="tarow">
+        <button class="addtxn" onclick="openTxn(${cat.id})">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add Transaction
+        </button>
+      </div>` : `<p style="font-size:.8rem;color:var(--s5);margin-bottom:.75rem;font-style:italic">🔒 This session is closed — transactions are read-only.</p>`}
+      <div id="tl-${cat.id}"><div class="etx">Loading…</div></div>
+
+      <!-- Per-category chart -->
+      <div class="cat-chart-section">
+        <div class="cat-chart-title">📊 ${esc(cat.name)} — Spending Breakdown</div>
+        <div class="cat-chartwrap">
+          <canvas id="catcv-${cat.id}" height="220"></canvas>
+          <div id="catcemp-${cat.id}" class="cemp hide">
+            <div class="empi" style="font-size:1.5rem">📈</div>
+            <p style="font-size:.8rem">No expenses recorded yet.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    ${historyItems.length ? `
+    <!-- Session history -->
+    <div class="session-history">
+      <div class="sess-hist-toggle" onclick="this.nextElementSibling.classList.toggle('open')">
+        <span>📋 Session History (${historyItems.length} previous)</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="sess-hist-body">
+        ${historyItems.map(({ cat: hc, det: hd }) => `
+        <div class="sess-hist-item">
+          <div class="shi-header">
+            <span class="shi-title">${esc(hc.name)} · Session ${hc.session_num || 1} <span style="font-size:.7rem;color:var(--s5)">${hc.created_at ? hc.created_at.split('T')[0] || hc.created_at.split(' ')[0] : ''}</span></span>
+          </div>
+          <div class="shi-stats">
+            <div class="shi-stat">Opening: <span class="op">${fmt(hc.opening_balance)}</span></div>
+            <div class="shi-stat">Expense: <span class="exp">${fmt(hd.expense || 0)}</span></div>
+
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>` : ''}`;
+
+  loadTxns(id);
+}
+
+// ── TRANSACTIONS ──────────────────────────────────────────
+async function loadTxns(cid) {
+  const el = document.getElementById(`tl-${cid}`);
+  if (!el) return;
+  el.innerHTML = '<div class="etx">Loading…</div>';
+  const d = await get(`/api/transactions?category_id=${cid}`);
+  if (d.error) { el.innerHTML = `<div class="etx">${esc(d.error)}</div>`; return; }
+  renderTxns(cid, d.transactions || []);
+  renderCatChart(cid, d.transactions || []);
+}
+
+function renderTxns(cid, txns) {
+  const el = document.getElementById(`tl-${cid}`);
+  if (!el) return;
+  if (!txns.length) {
+    el.innerHTML = '<div class="etx">No transactions yet. Click "Add Transaction" above.</div>';
+    return;
+  }
+  const rows = txns.map(t => {
+    const isInc = t.type === 'income';
+    // Safely stringify for inline onclick
+    const txObj = JSON.stringify(t).replace(/"/g, '&quot;');
+    return `
+      <tr>
+        <td>${fmtDate(t.date)}</td>
+        <td>${esc(t.reason || '—')}</td>
+        <td><span class="tbad ${t.type}">${t.type}</span></td>
+        <td class="num amt-inc">${isInc   ? '+' + fmt(t.amount) : ''}</td>
+        <td class="num amt-exp">${!isInc  ? '−' + fmt(t.amount) : ''}</td>
+        <td class="actions">
+          <button class="bic ed" onclick='openTxn(${cid}, ${txObj})' title="Edit">✏️</button>
+          <button class="bic dl" onclick="delTxn(${t.id}, ${cid})" title="Delete">🗑️</button>
+        </td>
+      </tr>`;
+  }).join('');
+  el.innerHTML = `
+    <table class="txn-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Description</th>
+          <th>Type</th>
+          <th class="num" style="color:#34d399">Income</th>
+          <th class="num" style="color:#f87171">Expense</th>
+          <th class="num">Actions</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+// ── PER-CATEGORY CHART ────────────────────────────────────
+function renderCatChart(cid, txns) {
+  const cv  = document.getElementById(`catcv-${cid}`);
+  const emp = document.getElementById(`catcemp-${cid}`);
+  if (!cv) return;
+
+  const expMap = {};
+  txns.forEach(t => {
+    if (t.type === 'expense') {
+      const label = t.reason && t.reason.trim() ? t.reason.trim() : 'Other';
+      expMap[label] = (expMap[label] || 0) + t.amount;
+    }
+  });
+
+  const labels = Object.keys(expMap);
+  const data   = Object.values(expMap);
+
+  if (!labels.length) {
+    if (emp) emp.classList.remove('hide');
+    cv.style.display = 'none';
+    return;
+  }
+  if (emp) emp.classList.add('hide');
+  cv.style.display = '';
+
+  if (catCharts[cid]) { catCharts[cid].destroy(); delete catCharts[cid]; }
+  catCharts[cid] = new Chart(cv, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: labels.map((_, i) => COLORS[i % COLORS.length]),
+        borderColor: '#1a2844', borderWidth: 3, hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      plugins: {
+        legend: { position:'bottom', labels:{ color:'#94a3b8', font:{family:'DM Sans',size:11}, padding:12, usePointStyle:true } },
+        tooltip: { callbacks: { label: c => ` ${c.label}: ₹${c.parsed.toLocaleString('en-IN',{minimumFractionDigits:2})}` } }
+      }
+    }
+  });
+}
+
+// ── CATEGORY MODAL ────────────────────────────────────────
+function openCat(id = null) {
+  document.getElementById('cmtitle').textContent = id ? 'Edit Category' : 'Add Category';
+  document.getElementById('cid').value   = '';
+  document.getElementById('cname').value = '';
+  document.getElementById('copn').value  = '';
+
+  // Show "use closing balance from" section only when adding new
+  const wrap = document.getElementById('useClosingWrap');
+  const sel  = document.getElementById('closeFromSel');
+  if (!id) {
+    // Populate dropdown with cats that have a closing balance
+    const withClosing = cats.filter(c => c.closing_balance !== null && c.closing_balance !== undefined);
+    if (withClosing.length) {
+      sel.innerHTML = '<option value="">— Select a category —</option>';
+      withClosing.forEach(c => {
+        sel.innerHTML += `<option value="${c.id}" data-closing="${c.closing_balance}">${esc(c.name)} → ${fmt(c.closing_balance)}</option>`;
+      });
+      wrap.style.display = 'block';
+    } else {
+      wrap.style.display = 'none';
+    }
+  } else {
+    wrap.style.display = 'none';
+    const c = cats.find(x => x.id === id);
+    if (c) {
+      document.getElementById('cid').value   = c.id;
+      document.getElementById('cname').value = c.name;
+      document.getElementById('copn').value  = c.opening_balance;
+    }
+  }
+  document.getElementById('catmod').classList.remove('hide');
+  setTimeout(() => document.getElementById('cname').focus(), 100);
+}
+
+function applyClosingBalance() {
+  const sel = document.getElementById('closeFromSel');
+  const opt = sel.options[sel.selectedIndex];
+  if (!opt || !opt.value) return;
+  const closing = parseFloat(opt.getAttribute('data-closing')) || 0;
+  document.getElementById('copn').value = closing;
+  toast(`Opening balance set to ${fmt(closing)} from closing balance.`, 'ok');
+}
+function closeCat() { document.getElementById('catmod').classList.add('hide'); }
+
+async function saveCat() {
+  const id      = document.getElementById('cid').value;
+  const name    = document.getElementById('cname').value.trim();
+  const opening = parseFloat(document.getElementById('copn').value) || 0;
+  if (!name) { toast('Please enter a category name.', 'er'); return; }
+  const r = id
+    ? await put(`/api/categories/${id}`, { name, opening_balance: opening })
+    : await post('/api/categories', { name, opening_balance: opening, month });
+  if (r.error) { toast(r.error, 'er'); return; }
+  toast(id ? 'Category updated!' : 'Category added!', 'ok');
+  closeCat();
+  load();
+}
+
+async function delCat(id) {
+  if (!confirm('Delete this category and ALL its transactions?')) return;
+  if (catCharts[id]) { catCharts[id].destroy(); delete catCharts[id]; }
+  if (activeCatId === id) activeCatId = null;
+  const r = await del(`/api/categories/${id}`);
+  if (r.error) { toast(r.error, 'er'); return; }
+  toast('Category deleted.', 'ok');
+  load();
+}
+
+// ── TRANSACTION MODAL ─────────────────────────────────────
+function openTxn(cid, t = null) {
+  document.getElementById('tcid').value   = cid;
+  document.getElementById('tmtitle').textContent = t ? 'Edit Transaction' : 'Add Transaction';
+  document.getElementById('tid').value    = t ? t.id   : '';
+  document.getElementById('tdate').value  = t ? t.date : new Date().toISOString().split('T')[0];
+  document.getElementById('treason').value= t ? t.reason : '';
+  document.getElementById('tamt').value   = t ? t.amount : '';
+  stype(t ? t.type : 'expense');
+  document.getElementById('txnmod').classList.remove('hide');
+  setTimeout(() => document.getElementById('tamt').focus(), 100);
+}
+function closeTxn() { document.getElementById('txnmod').classList.add('hide'); }
+
+function stype(v) {
+  document.getElementById('ttype').value = v;
+  document.getElementById('te').className = 'tbtn' + (v === 'expense' ? ' on' : '');
+  document.getElementById('ti').className = 'tbtn' + (v === 'income'  ? ' on' : '');
+}
+
+async function saveTxn() {
+  const id     = document.getElementById('tid').value;
+  const cid    = parseInt(document.getElementById('tcid').value);
+  const type   = document.getElementById('ttype').value;
+  const amount = parseFloat(document.getElementById('tamt').value);
+  const reason = document.getElementById('treason').value.trim();
+  const date   = document.getElementById('tdate').value;
+  if (!amount || amount <= 0) { toast('Enter a valid amount.', 'er'); return; }
+  if (!date)                  { toast('Select a date.', 'er'); return; }
+  const r = id
+    ? await put(`/api/transactions/${id}`, { type, amount, reason, date })
+    : await post('/api/transactions', { category_id: cid, type, amount, reason, date });
+  if (r.error) { toast(r.error, 'er'); return; }
+  toast(id ? 'Transaction updated!' : 'Transaction added!', 'ok');
+  closeTxn();
+  await loadSum();
+  // Re-render panel so stat bar + transactions + chart all refresh
+  renderCatPanel(cid);
+}
+
+async function delTxn(id, cid) {
+  if (!confirm('Delete this transaction?')) return;
+  const r = await del(`/api/transactions/${id}`);
+  if (r.error) { toast(r.error, 'er'); return; }
+  toast('Deleted.', 'ok');
+  await loadSum();
+  renderCatPanel(cid);
+}
+
+// ── CLOSE SESSION MODAL ──────────────────────────────────
+let _closingRemaining = 0;
+
+function openClosing(cid, remaining) {
+  _closingRemaining = remaining;
+  document.getElementById('closing-cid').value = cid;
+  document.getElementById('closing-val').value  = '';
+  document.getElementById('closingmod').classList.remove('hide');
+  setTimeout(() => document.getElementById('closing-val').focus(), 100);
+}
+function closeClosing() { document.getElementById('closingmod').classList.add('hide'); }
+function useRemaining() { document.getElementById('closing-val').value = _closingRemaining; }
+
+async function saveClosing() {
+  const cid  = parseInt(document.getElementById('closing-cid').value);
+  const val  = document.getElementById('closing-val').value;
+  const closing = parseFloat(val);
+  if (val === '' || isNaN(closing)) { toast('Enter a valid closing balance.', 'er'); return; }
+
+  const r = await post(`/api/categories/${cid}/close`, { closing_balance: closing });
+  if (r.error) { toast(r.error, 'er'); return; }
+
+  toast('Session closed! 🔒 You can now start a new session.', 'ok');
+  closeClosing();
+  // Update local cats
+  const idx = cats.findIndex(c => c.id === cid);
+  if (idx >= 0) { cats[idx].is_closed = true; cats[idx].closing_balance = closing; }
+  await loadSum();
+  renderCats();
+}
+
+// ── NEW SESSION MODAL ────────────────────────────────────
+function openNewSession(parentId) {
+  const parent = cats.find(c => c.id === parentId);
+  if (!parent) return;
+  document.getElementById('ns-parent-id').value   = parentId;
+  document.getElementById('ns-cat-name').textContent = parent.name;
+  // Pre-fill with closing balance
+  const closing = parent.closing_balance !== null && parent.closing_balance !== undefined
+    ? parent.closing_balance : 0;
+  document.getElementById('ns-opening').value = closing;
+  document.getElementById('newSessionMod').classList.remove('hide');
+  setTimeout(() => document.getElementById('ns-opening').focus(), 100);
+}
+function closeNewSession() { document.getElementById('newSessionMod').classList.add('hide'); }
+
+async function saveNewSession() {
+  const parentId = parseInt(document.getElementById('ns-parent-id').value);
+  const opening  = parseFloat(document.getElementById('ns-opening').value) || 0;
+
+  const r = await post(`/api/categories/${parentId}/new-session`, {
+    month,
+    opening_balance: opening
+  });
+  if (r.error) { toast(r.error, 'er'); return; }
+
+  toast(`New session started for ${r.name}! Opening: ${fmt(r.opening_balance)}`, 'ok');
+  closeNewSession();
+  activeCatId = r.id;   // switch to new session
+  await load();
+}
+
+// ── HELPERS ───────────────────────────────────────────────
+async function get(url) {
+  try {
+    const r = await fetch(url);
+    if (r.status === 401) { location.href = '/'; return {}; }
+    return r.json();
+  } catch { return { error: 'Network error' }; }
+}
+async function post(url, body) {
+  try {
+    const r = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+    if (r.status === 401) { location.href = '/'; return {}; }
+    return r.json();
+  } catch { return { error: 'Network error' }; }
+}
+async function put(url, body) {
+  try {
+    return (await fetch(url, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) })).json();
+  } catch { return { error: 'Network error' }; }
+}
+async function del(url) {
+  try { return (await fetch(url, { method:'DELETE' })).json(); }
+  catch { return { error: 'Network error' }; }
+}
+
+function fmt(n)     { return '₹' + (parseFloat(n) || 0).toLocaleString('en-IN', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
+function setText(id, t) { const e = document.getElementById(id); if (e) e.textContent = t; }
+function esc(s)     { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function fmtDate(s) { if (!s) return ''; return new Date(s + 'T00:00:00').toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }); }
+
+let _tt;
+function toast(msg, type = 'ok') {
+  const e = document.getElementById('toast');
+  e.textContent = msg;
+  e.className   = `toast ${type}`;
+  clearTimeout(_tt);
+  _tt = setTimeout(() => e.className = 'toast hide', 3000);
+}
+</script>
+</body>
+</html>
