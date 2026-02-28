@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BudgetSmart — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --g:#10b981; --gd:#059669;
+      --bg:#0a0f1e; --s9:#0f172a; --s7:#334155; --s4:#94a3b8; --wh:#fff;
+    }
+    body {
+      font-family:'DM Sans',sans-serif; background:var(--bg);
+      min-height:100vh; display:flex; align-items:center;
+      justify-content:center; padding:1rem; overflow:hidden;
+    }
+    .bg { position:fixed; inset:0; background:radial-gradient(ellipse at 20% 50%,#0f4c2a,transparent 60%),radial-gradient(ellipse at 80% 20%,#064e3b,transparent 50%),var(--bg); }
+    .blob { position:absolute; border-radius:50%; filter:blur(80px); opacity:.2; animation:drift 12s ease-in-out infinite alternate; }
+    .b1 { width:500px; height:500px; background:var(--g);   top:-150px; left:-100px; }
+    .b2 { width:350px; height:350px; background:#34d399;    top:60%;    right:-80px; animation-delay:-4s; }
+    .b3 { width:250px; height:250px; background:#6ee7b7;    bottom:10%; left:30%;    animation-delay:-8s; }
+    @keyframes drift { to { transform:translate(30px,20px) scale(1.05); } }
+
+    .wrap { position:relative; z-index:1; width:100%; max-width:420px; display:flex; flex-direction:column; align-items:center; gap:1rem; }
+    .card { background:rgba(30,41,59,.92); backdrop-filter:blur(24px); border:1px solid rgba(16,185,129,.2); border-radius:24px; padding:2.5rem 2rem; width:100%; box-shadow:0 25px 50px rgba(0,0,0,.5); }
+
+    .brand { text-align:center; margin-bottom:2rem; }
+    .ico { width:64px; height:64px; background:linear-gradient(135deg,var(--g),#34d399); border-radius:18px; display:inline-flex; align-items:center; justify-content:center; font-size:1.8rem; color:#fff; margin-bottom:.75rem; box-shadow:0 8px 24px rgba(16,185,129,.4); }
+    .brand h1 { font-family:'Syne',sans-serif; font-size:1.6rem; font-weight:800; color:var(--wh); letter-spacing:-.02em; }
+    .brand p  { color:var(--s4); font-size:.85rem; margin-top:2px; }
+
+    .tabs { display:flex; gap:.5rem; background:var(--s9); border-radius:12px; padding:4px; margin-bottom:1.5rem; }
+    .tab  { flex:1; padding:.55rem; border:none; border-radius:9px; background:transparent; color:var(--s4); font-family:'DM Sans',sans-serif; font-size:.9rem; font-weight:500; cursor:pointer; transition:all .2s; }
+    .tab.on { background:var(--g); color:#fff; box-shadow:0 4px 12px rgba(16,185,129,.35); }
+
+    .alert { padding:.75rem 1rem; border-radius:10px; font-size:.875rem; margin-bottom:1rem; font-weight:500; display:none; }
+    .alert.err { background:rgba(239,68,68,.15); color:#fca5a5; border:1px solid rgba(239,68,68,.3); display:block; }
+    .alert.ok  { background:rgba(16,185,129,.15); color:#6ee7b7; border:1px solid rgba(16,185,129,.3); display:block; }
+
+    .panel { display:flex; flex-direction:column; gap:1.1rem; }
+    .panel.hide { display:none; }
+
+    .fg { display:flex; flex-direction:column; gap:.4rem; }
+    .fg label { font-size:.78rem; font-weight:600; color:var(--s4); text-transform:uppercase; letter-spacing:.04em; }
+    .fg input  { padding:.75rem 1rem; background:var(--s9); border:1.5px solid rgba(255,255,255,.08); border-radius:10px; color:var(--wh); font-family:'DM Sans',sans-serif; font-size:.95rem; outline:none; transition:border-color .2s; }
+    .fg input:focus { border-color:var(--g); }
+    .fg input::placeholder { color:var(--s7); }
+
+    .btn { padding:.85rem; background:linear-gradient(135deg,var(--g),var(--gd)); border:none; border-radius:12px; color:#fff; font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; cursor:pointer; margin-top:.5rem; box-shadow:0 6px 20px rgba(16,185,129,.35); transition:transform .15s,box-shadow .15s; }
+    .btn:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(16,185,129,.45); }
+    .btn:disabled { opacity:.7; cursor:not-allowed; transform:none; }
+    .btn-ghost { padding:.85rem; background:transparent; border:1.5px solid rgba(255,255,255,.12); border-radius:12px; color:var(--s4); font-family:'DM Sans',sans-serif; font-size:.9rem; font-weight:500; cursor:pointer; margin-top:.25rem; transition:background .2s; }
+    .btn-ghost:hover { background:rgba(255,255,255,.05); }
+
+    .sw { text-align:center; font-size:.875rem; color:var(--s4); margin-top:.25rem; }
+    .sw a { color:var(--g); text-decoration:none; font-weight:500; cursor:pointer; }
+
+    /* OTP boxes */
+    .otp-row { display:flex; gap:.6rem; justify-content:center; }
+    .otp-box { width:48px; height:54px; background:var(--s9); border:1.5px solid rgba(255,255,255,.08); border-radius:10px; color:var(--wh); font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:700; text-align:center; outline:none; transition:border-color .2s; }
+    .otp-box:focus { border-color:var(--g); }
+
+    .step-label { font-size:.78rem; font-weight:600; color:var(--s4); text-transform:uppercase; letter-spacing:.06em; margin-bottom:.5rem; }
+    .resend-row { text-align:center; font-size:.82rem; color:var(--s4); margin-top:.25rem; }
+    .resend-row a { color:var(--g); cursor:pointer; font-weight:500; }
+    .resend-row a.disabled { color:var(--s7); pointer-events:none; }
+
+    .foot { color:#475569; font-size:.78rem; }
+  </style>
+</head>
+<body>
+
+<div class="bg">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+</div>
+
+<div class="wrap">
+  <div class="card">
+    <div class="brand">
+      <div class="ico">₹</div>
+      <h1>BudgetSmart</h1>
+      <p>Student Expense &amp; Budget Planner</p>
+    </div>
+
+    <!-- TAB ROW (hidden on forgot-password screens) -->
+    <div class="tabs" id="main-tabs">
+      <button class="tab on" id="tl" onclick="showPanel('login')">Login</button>
+      <button class="tab"    id="tr" onclick="showPanel('register')">Register</button>
+    </div>
+
+    <div id="al" class="alert"></div>
+
+    <!-- ── LOGIN PANEL ── -->
+    <div id="panel-login" class="panel">
+      <div class="fg">
+        <label>Email Address</label>
+        <input type="email" id="le" placeholder="you@email.com"/>
+      </div>
+      <div class="fg">
+        <label>Password</label>
+        <input type="password" id="lp" placeholder="••••••••"/>
+      </div>
+      <button class="btn" id="lb" onclick="doLogin()">Sign In</button>
+      <p class="sw"><a onclick="showPanel('forgot')">Forgot password?</a></p>
+      <p class="sw">No account? <a onclick="showPanel('register')">Register →</a></p>
+    </div>
+
+    <!-- ── REGISTER PANEL ── -->
+    <div id="panel-register" class="panel hide">
+      <div class="fg">
+        <label>Full Name</label>
+        <input type="text" id="rn" placeholder="Your Name"/>
+      </div>
+      <div class="fg">
+        <label>Email Address</label>
+        <input type="email" id="re" placeholder="you@email.com"/>
+      </div>
+      <div class="fg">
+        <label>Password (min 6 characters)</label>
+        <input type="password" id="rp" placeholder="••••••••"/>
+      </div>
+      <button class="btn" id="rb" onclick="doRegister()">Create Account</button>
+      <p class="sw">Have an account? <a onclick="showPanel('login')">Sign in →</a></p>
+    </div>
+
+    <!-- ── FORGOT — STEP 1: Enter Email ── -->
+    <div id="panel-forgot" class="panel hide">
+      <p class="step-label">Step 1 of 3 — Enter your registered email</p>
+      <div class="fg">
+        <label>Email Address</label>
+        <input type="email" id="fe" placeholder="you@email.com"/>
+      </div>
+      <button class="btn" id="fb1" onclick="doSendOTP()">Send OTP to Email</button>
+      <button class="btn-ghost" onclick="showPanel('login')">← Back to Login</button>
+    </div>
+
+    <!-- ── FORGOT — STEP 2: Enter OTP ── -->
+    <div id="panel-otp" class="panel hide">
+      <p class="step-label">Step 2 of 3 — Enter the 6-digit OTP sent to your email</p>
+      <div class="otp-row">
+        <input class="otp-box" id="o1" maxlength="1" oninput="otpNext(this,'o2')" onkeydown="otpBack(event,this,'')"/>
+        <input class="otp-box" id="o2" maxlength="1" oninput="otpNext(this,'o3')" onkeydown="otpBack(event,this,'o1')"/>
+        <input class="otp-box" id="o3" maxlength="1" oninput="otpNext(this,'o4')" onkeydown="otpBack(event,this,'o2')"/>
+        <input class="otp-box" id="o4" maxlength="1" oninput="otpNext(this,'o5')" onkeydown="otpBack(event,this,'o3')"/>
+        <input class="otp-box" id="o5" maxlength="1" oninput="otpNext(this,'o6')" onkeydown="otpBack(event,this,'o4')"/>
+        <input class="otp-box" id="o6" maxlength="1" oninput="otpNext(this,'')"   onkeydown="otpBack(event,this,'o5')"/>
+      </div>
+      <button class="btn" id="fb2" onclick="doVerifyOTP()">Verify OTP</button>
+      <div class="resend-row">Didn't get it? <a id="resend-link" onclick="doResend()">Resend OTP</a></div>
+      <button class="btn-ghost" onclick="showPanel('forgot')">← Back</button>
+    </div>
+
+    <!-- ── FORGOT — STEP 3: New Password ── -->
+    <div id="panel-newpwd" class="panel hide">
+      <p class="step-label">Step 3 of 3 — Set your new password</p>
+      <div class="fg">
+        <label>New Password (min 6 characters)</label>
+        <input type="password" id="np1" placeholder="New password"/>
+      </div>
+      <div class="fg">
+        <label>Confirm New Password</label>
+        <input type="password" id="np2" placeholder="Repeat password"/>
+      </div>
+      <button class="btn" id="fb3" onclick="doResetPwd()">Reset Password</button>
+    </div>
+
+  </div>
+  <p class="foot">Your data is stored securely on this server.</p>
+</div>
+
+<script>
+  // ── STATE ─────────────────────────────────────────────
+  let forgotEmail = '', verifiedOTP = '';
+
+  // ── PANEL SWITCHER ────────────────────────────────────
+  function showPanel(name) {
+    ['login','register','forgot','otp','newpwd'].forEach(p => {
+      document.getElementById(`panel-${p}`).classList.add('hide');
+    });
+    document.getElementById(`panel-${name}`).classList.remove('hide');
+
+    // Tab bar only shows for login/register
+    const tabs = document.getElementById('main-tabs');
+    const isMains = name === 'login' || name === 'register';
+    tabs.style.display = isMains ? 'flex' : 'none';
+    if (name === 'login')    { document.getElementById('tl').className = 'tab on'; document.getElementById('tr').className = 'tab'; }
+    if (name === 'register') { document.getElementById('tr').className = 'tab on'; document.getElementById('tl').className = 'tab'; }
+    cls();
+  }
+
+  function show(m, t) { const e = document.getElementById('al'); e.textContent = m; e.className = 'alert ' + t; }
+  function cls()       { document.getElementById('al').className = 'alert'; }
+
+  function setLoading(id, loading, text, loadText = 'Please wait…') {
+    const b = document.getElementById(id);
+    b.disabled = loading;
+    b.textContent = loading ? loadText : text;
+  }
+
+  // ── LOGIN ─────────────────────────────────────────────
+  async function doLogin() {
+    cls();
+    const email = document.getElementById('le').value.trim();
+    const pwd   = document.getElementById('lp').value;
+    if (!email || !pwd) { show('Please fill in all fields.', 'err'); return; }
+    setLoading('lb', true, 'Sign In', 'Signing in…');
+    const r = await api('/api/login', { email, password: pwd });
+    setLoading('lb', false, 'Sign In');
+    if (r.error) { show(r.error, 'err'); return; }
+    show('Login successful! Redirecting…', 'ok');
+    setTimeout(() => location.href = r.redirect, 600);
+  }
+
+  // ── REGISTER ──────────────────────────────────────────
+  async function doRegister() {
+    cls();
+    const name  = document.getElementById('rn').value.trim();
+    const email = document.getElementById('re').value.trim();
+    const pwd   = document.getElementById('rp').value;
+    if (!name || !email || !pwd) { show('Please fill in all fields.', 'err'); return; }
+    setLoading('rb', true, 'Create Account', 'Creating…');
+    const r = await api('/api/register', { name, email, password: pwd });
+    setLoading('rb', false, 'Create Account');
+    if (r.error) { show(r.error, 'err'); return; }
+    show('Account created! Redirecting…', 'ok');
+    setTimeout(() => location.href = r.redirect, 600);
+  }
+
+  // ── FORGOT — STEP 1 ───────────────────────────────────
+  async function doSendOTP() {
+    cls();
+    const email = document.getElementById('fe').value.trim();
+    if (!email) { show('Enter your email address.', 'err'); return; }
+    setLoading('fb1', true, 'Send OTP to Email', 'Sending…');
+    const r = await api('/api/forgot-password', { email });
+    setLoading('fb1', false, 'Send OTP to Email');
+    if (r.error) { show(r.error, 'err'); return; }
+    forgotEmail = email;
+    show(r.message, 'ok');
+    setTimeout(() => { cls(); showPanel('otp'); }, 1200);
+  }
+
+  // ── OTP BOXES ─────────────────────────────────────────
+  function otpNext(el, nextId) {
+    el.value = el.value.replace(/\D/g, '');
+    if (el.value && nextId) document.getElementById(nextId).focus();
+  }
+  function otpBack(e, el, prevId) {
+    if (e.key === 'Backspace' && !el.value && prevId) {
+      document.getElementById(prevId).focus();
+    }
+  }
+  function getOTP() {
+    return ['o1','o2','o3','o4','o5','o6'].map(id => document.getElementById(id).value).join('');
+  }
+  function clearOTP() {
+    ['o1','o2','o3','o4','o5','o6'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('o1').focus();
+  }
+
+  // ── FORGOT — STEP 2 ───────────────────────────────────
+  async function doVerifyOTP() {
+    cls();
+    const otp = getOTP();
+    if (otp.length < 6) { show('Enter the complete 6-digit OTP.', 'err'); return; }
+    setLoading('fb2', true, 'Verify OTP', 'Verifying…');
+    const r = await api('/api/verify-otp', { email: forgotEmail, otp });
+    setLoading('fb2', false, 'Verify OTP');
+    if (r.error) { show(r.error, 'err'); return; }
+    verifiedOTP = otp;
+    show('OTP verified! Set your new password.', 'ok');
+    setTimeout(() => { cls(); showPanel('newpwd'); }, 1000);
+  }
+
+  async function doResend() {
+    cls();
+    const link = document.getElementById('resend-link');
+    link.classList.add('disabled'); link.textContent = 'Sending…';
+    const r = await api('/api/forgot-password', { email: forgotEmail });
+    if (r.error) { show(r.error, 'err'); }
+    else { show('New OTP sent to your email.', 'ok'); clearOTP(); }
+    setTimeout(() => { link.classList.remove('disabled'); link.textContent = 'Resend OTP'; }, 30000);
+  }
+
+  // ── FORGOT — STEP 3 ───────────────────────────────────
+  async function doResetPwd() {
+    cls();
+    const p1 = document.getElementById('np1').value;
+    const p2 = document.getElementById('np2').value;
+    if (!p1 || !p2)  { show('Please fill in both fields.', 'err'); return; }
+    if (p1 !== p2)   { show('Passwords do not match.', 'err'); return; }
+    if (p1.length < 6) { show('Password must be at least 6 characters.', 'err'); return; }
+    setLoading('fb3', true, 'Reset Password', 'Resetting…');
+    const r = await api('/api/reset-password', { email: forgotEmail, otp: verifiedOTP, password: p1 });
+    setLoading('fb3', false, 'Reset Password');
+    if (r.error) { show(r.error, 'err'); return; }
+    show('Password reset! Redirecting to login…', 'ok');
+    document.getElementById('np1').value = '';
+    document.getElementById('np2').value = '';
+    setTimeout(() => { cls(); showPanel('login'); }, 1800);
+  }
+
+  // ── API HELPER ────────────────────────────────────────
+  async function api(url, body) {
+    try {
+      const r = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      return r.json();
+    } catch { return { error: 'Network error. Please try again.' }; }
+  }
+</script>
+</body>
+</html>
