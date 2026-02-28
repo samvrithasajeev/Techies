@@ -93,12 +93,8 @@ It includes 8 screenshots and 1 video of the working project in it.
 **System Architecture:**
 
 ![Architecture Diagram](docs/architecture.png)
-*Explain your system architecture - components, data flow, tech stack interaction*
-
-**Application Workflow:**
-
-![Workflow](docs/workflow.png)
-*Add caption explaining your workflow*
+https://drive.google.com/drive/folders/1neF46znQvtgWNDy4cOugUWLVoYe3UaOY?usp=drive_link
+It is a basic flowchart to easily understand
 
 ---
 
@@ -369,17 +365,27 @@ https://drive.google.com/file/d/1XKepiTFBguSVxdidFL5CPtaHzSUl0AZX/view?usp=drive
 
 If you used AI tools during development, document them here for transparency:
 
-**Tool Used:**  GitHub, Git, Gemini, ChatGPT, Claude
+**Tool Used:**  Frontend: HTML, CSS, Bootstrap
+                Backend: Python (Flask)
+                Database: MySQL
+                API Testing: Postman
+                Version Control: GitHub
+                Deployment/Storage: Google Drive (for files if used)
 
 **Purpose:** [What you used it for]
-- Example: "Generated boilerplate React components"
-- Example: "Debugging assistance for async functions"
-- Example: "Code review and optimization suggestions"
+      To develop a user-friendly web application
+      To store and manage data efficiently
+      To provide secure login and data storage
+      To make the system accessible and easy to use
 
 **Key Prompts Used:**
-- "Create a REST API endpoint for user authentication"
-- "Debug this async function that's causing race conditions"
-- "Optimize this database query for better performance"
+Build a full-stack responsive web application called Smart Student Expense & Budget Planner that functions as a modern dashboard-style website and behaves like an installable Chrome application. The system must include secure user authentication where users can register and log in using email and password, with passwords securely hashed before storing in a relational database. After successful login, create a session so the user remains authenticated and the login page must not appear again unless the user explicitly logs out. A logout button must be placed at the top-left corner of the dashboard, and clicking it should properly destroy the session and redirect the user to the login page. Unauthorized users must not be able to access the dashboard without logging in.
+
+After login, the user should be redirected to a clean, responsive dashboard interface that works smoothly on both desktop and mobile devices. At the top of the dashboard, include a month and year dropdown filter so that when the user selects a specific month, all displayed financial data dynamically updates to show only the data related to that selected month. The dashboard must display summary cards showing Total Monthly Budget, Total Expense, Remaining Balance, and Expense Usage Percentage. If total expenses reach or exceed 80% of the monthly budget, display a yellow warning message, and if expenses exceed 100%, display a red alert message. The monthly budget feature must be optional, allowing users to add or edit the budget for each month but not forcing them to set one.
+
+Below the summary section, provide category management functionality where users can create, edit, and delete categories representing payment sources such as Cash, GPay, SBI Bank, HDFC Bank, or any custom name. Each category must store a category name, an opening balance for the selected month, and an automatically calculated remaining balance. Inside each category, users must be able to add transactions with fields including date, description or reason, type (income or expense toggle), and amount. Each transaction must be editable and deletable. When a transaction is added, the system must automatically update the category’s remaining balance (increase for income, decrease for expense), update total monthly expense, recalculate remaining balance, and refresh the expense usage percentage in real time.
+
+At the bottom of the dashboard, include a dynamic chart (such as a pie or bar chart using Chart.js) that displays category-wise expense breakdown like travel, food, study, shopping, and others, and ensure the chart updates automatically when the month filter changes. All data including users, categories, transactions, and budgets must be permanently stored in the database so that logging out does not delete any saved information. When the user logs in again, the system must retrieve and display previously saved data correctly. Structure the database with tables for Users (id, email, password), Categories (id, user_id, name, opening_balance, month), Transactions (id, user_id, category_id, type, amount, reason, date), and Budgets (id, user_id, month, monthly_budget). Ensure clean UI/UX with a dashboard layout, card-based summaries, smooth navigation, proper session handling, input validation, secure authentication, dynamic calculations, and a professional finance-app appearance that can later be extended into a Progressive Web App.
 
 **Percentage of AI-generated code:** [Approximately X%]
 
@@ -395,9 +401,15 @@ If you used AI tools during development, document them here for transparency:
 
 ## Team Contributions
 
-- [Name 1]: [Specific contributions - e.g., Frontend development, API integration, etc.]
-- [Name 2]: [Specific contributions - e.g., Backend development, Database design, etc.]
-- [Name 3]: [Specific contributions - e.g., UI/UX design, Testing, Documentation, etc.]
+- [Anamika Lilly]: Designed frontend pages
+                   Developed backend logic
+                   Integrated database
+                   Tested APIs using Postman
+                   Debugging and final integration
+- [Samvritha V.S]: Assisted in UI design
+                   Helped in database design
+                   Conducted testing
+                   Documentation and PPT preparation
 
 ---
 
