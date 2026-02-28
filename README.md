@@ -6,20 +6,20 @@
 
 ## Basic Details
 
-### Team Name: [Name]
+### Team Name: [Techies]
 
 ### Team Members
-- Member 1: [Name] - [College]
-- Member 2: [Name] - [College]
+- Member 1: [Anamika Lily] - [AISAT]
+- Member 2: [Samvritha V.S] - [AISAT]
 
 ### Hosted Project Link
-[mention your project hosted link here]
+[http://127.0.0.1:5000]
 
 ### Project Description
-[2-3 lines about what your project does]
+[An Expense Tracker with Budget Planner is a web application that helps users record their daily expenses and manage their income effectively. It allows users to set monthly budgets, track spending by category, and monitor savings. This helps user to control unnecessary expenses and improve financial planning habits.]
 
 ### The Problem statement
-[What problem are you solving?]
+[An Expense Tracker with Budget Planner solves the problem of unorganized spending and poor financial planning faced by many individuals. People often lose track of daily expenses and exceed their budgets without realizing it. This system helps users monitor their income and expenses, control overspending, and manage savings more effectively.]
 
 ### The Solution
 [How are you solving it?]
