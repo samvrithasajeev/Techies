@@ -2,27 +2,27 @@
   <img src="./img.png" alt="Project Banner" width="100%">
 </p>
 
-# [Project Name] 🎯
+# EXPENSE TRACKER 🎯
 
 ## Basic Details
 
-### Team Name: [Techies]
+### Team Name: Techies
 
 ### Team Members
 - Member 1: [Anamika Lily] - [AISAT]
 - Member 2: [Samvritha V.S] - [AISAT]
 
 ### Hosted Project Link
-[http://127.0.0.1:5000]
+http://127.0.0.1:5000
 
 ### Project Description
-[An Expense Tracker with Budget Planner is a web application that helps users record their daily expenses and manage their income effectively. It allows users to set monthly budgets, track spending by category, and monitor savings. This helps user to control unnecessary expenses and improve financial planning habits.]
+An Expense Tracker with Budget Planner is a web application that helps users record their daily expenses and manage their income effectively. It allows users to set monthly budgets, track spending by category, and monitor savings. This helps user to control unnecessary expenses and improve financial planning habits.
 
 ### The Problem statement
-[An Expense Tracker with Budget Planner solves the problem of unorganized spending and poor financial planning faced by many individuals. People often lose track of daily expenses and exceed their budgets without realizing it. This system helps users monitor their income and expenses, control overspending, and manage savings more effectively.]
+An Expense Tracker with Budget Planner solves the problem of unorganized spending and poor financial planning faced by many individuals. People often lose track of daily expenses and exceed their budgets without realizing it. This system helps users monitor their income and expenses, control overspending, and manage savings more effectively.
 
 ### The Solution
-[How are you solving it?]
+We are solving this by creating a web-based Expense Tracker with Budget Planner that records daily income and expenses and automatically updates the remaining balance in the database. The system securely stores user data even after logout and provides real-time budget tracking and spending analysis. This helps users manage their money efficiently and avoid overspending.
 
 ---
 
@@ -31,27 +31,28 @@
 ### Technologies/Components Used
 
 **For Software:**
-- Languages used: [e.g., JavaScript, Python, Java]
-- Frameworks used: [e.g., React, Django, Spring Boot]
-- Libraries used: [e.g., axios, pandas, JUnit]
-- Tools used: [e.g., VS Code, Git, Docker]
+- Languages used: HTML, Javascript, CSS
+- Frameworks used: Flask, HTML, SQLite
+- Libraries used: Flask, Chart.js
+- Tools used: VS Code, SQLite, Git & GitHub, Vercel, Chrome Browser
 
 **For Hardware:**
-- Main components: [List main components]
-- Specifications: [Technical specifications]
-- Tools required: [List tools needed]
-
----
+- Main components: Laptop, Internet Connection, Cloud Server
+- Specifications: Processor: Intel i3 / i5 or higher, RAM: Minimum 4GB (8GB recommended), Storage: 256GB HDD/SSD, Operating System: Windows 10/11 / macOS / Linux
+- Tools required: VS Code (Code Editor), Python (Flask Framework), SQLite Database, Git & GitHub, Chrome Browser (Testing), Vercel (Deployment)
 
 ## Features
 
 List the key features of your project:
-- Feature 1: [Description]
-- Feature 2: [Description]
-- Feature 3: [Description]
-- Feature 4: [Description]
+- Feature 1: User Authentication System
+  Secure login and registration with password hashing and OTP-based password reset to protect user accounts.
+- Feature 2:  Monthly Budget Planning
+  Users can set a monthly budget and track how much amount is used and remaining in real time.
+- Feature 3: Category-Based Expense Tracking
+  Users can create categories (Cash, GPay, Bank, etc.) and record income and expenses separately for better management.
+- Feature 4: Data Persistence & Reports
+  All transactions are stored in the database and displayed with summary cards and charts for easy analysis.
 
----
 
 ## Implementation
 
